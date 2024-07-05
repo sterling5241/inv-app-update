@@ -1,0 +1,4 @@
+{
+    "version": "1.0.2",
+    "update_url": "http://localhost:8000/yourapp_update.zip"
+}
