@@ -1,11 +1,19 @@
 import requests
 import zipfile
 import shutil
+import os
+import sys
 
-# Auto-update check using GitHub
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
+
 def check_for_updates():
-    repo_owner = 'your-github-username'
-    repo_name = 'your-repo-name'
+    repo_owner = 'sterling5241'
+    repo_name = 'inv-app-update'
     current_version = '1.0.0'  # Replace with your current version
 
     print("Checking for updates...")
@@ -16,7 +24,7 @@ def check_for_updates():
         latest_version = latest_release['tag_name']
         
         if latest_version > current_version:
-            download_url = latest_release['assets'][0]['browser_download_url']
+            download_url = latest_release['zipball_url']
             print(f"New version available: {latest_version}. Downloading update...")
             download_and_apply_update(download_url)
         else:
@@ -33,13 +41,11 @@ def download_and_apply_update(download_url):
     
     print("Update downloaded. Applying update...")
     
-    # Unzip the downloaded update
     with zipfile.ZipFile(update_file_path, 'r') as zip_ref:
         zip_ref.extractall(resource_path('update_temp'))
     
     update_temp_path = resource_path('update_temp')
     
-    # Replace current files with the new ones
     for root, dirs, files in os.walk(update_temp_path):
         for file in files:
             source_file = os.path.join(root, file)
@@ -52,9 +58,11 @@ def download_and_apply_update(download_url):
             
             shutil.move(source_file, destination_file)
     
-    # Clean up
     shutil.rmtree(update_temp_path)
     os.remove(update_file_path)
     
-    messagebox.showinfo("Update", "Update installed successfully. Please restart the application.")
+    print("Update installed successfully. Please restart the application.")
     sys.exit()
+
+if __name__ == "__main__":
+    check_for_updates()
